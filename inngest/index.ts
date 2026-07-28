@@ -206,7 +206,7 @@ const autoAssignRider = inngest.createFunction(
       //generate 6 digit otp
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       const history = Array.isArray(order.statusHistory)
-        ? order.statusHistory
+        ? order?.statusHistory
         : ([] as any[]);
 
       history.push({
@@ -220,7 +220,7 @@ const autoAssignRider = inngest.createFunction(
           deliveryPartnerId: availableRider.id,
           deliveryOtp: otp,
           status: "Assigned",
-          history,
+          history: history,
         },
       });
       return {
