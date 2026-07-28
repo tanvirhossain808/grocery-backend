@@ -4,6 +4,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
 import { error, timeStamp } from "node:console";
+import { inngest } from "../inngest/index.js";
 
 export const createOrder = async (req: Request, res: Response) => {
   const { items, shippingAddress, paymentMethod } = req.body;
@@ -29,7 +30,7 @@ export const createOrder = async (req: Request, res: Response) => {
     }
   }
 
-  const ordersItem = items.map((item: any) => {
+  const ordersItems = items.map((item: any) => {
     const dbProduct = productMap[item.product];
     if (!dbProduct) throw new Error(`product ${item.product} not found`);
     return {
@@ -41,7 +42,7 @@ export const createOrder = async (req: Request, res: Response) => {
       unit: dbProduct.unit,
     };
   });
-  const subtotal = ordersItem.reduce(
+  const subtotal = ordersItems.reduce(
     (sum: number, item: any) => sum + item.price * item.quantity,
     0,
   );
@@ -49,10 +50,10 @@ export const createOrder = async (req: Request, res: Response) => {
   const tax = Math.round(subtotal * 0.08 * 100) / 100;
   const total = Math.round((subtotal + deliveryFee + tax) * 100) / 100;
 
-  const order = prisma.order.create({
+  const order = await prisma.order.create({
     data: {
       userId: req.user?.id as string,
-      items: ordersItem,
+      items: ordersItems,
       shippingAddress,
       paymentMethod,
       subtotal,
@@ -75,12 +76,22 @@ export const createOrder = async (req: Request, res: Response) => {
   res.json({ order });
 
   //decrease stock
-  for (const item of items) {
+  for (const item of ordersItems) {
     await prisma.product.update({
       where: { id: item.product },
       data: { stock: { decrement: item.quantity } },
     });
   }
+
+  for (const item of ordersItems) {
+    await inngest.send({
+      name: "inventory/stock.updated",
+      data: { productId: item.product },
+    });
+  }
+
+  await inngest.send({ name: "/order/placed", data: { orderId: order.id } });
+  //send stock update events for each product in  the order
 };
 
 //get user order data
