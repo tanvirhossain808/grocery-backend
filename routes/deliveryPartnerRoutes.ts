@@ -35,3 +35,5 @@ deliverPartnerRouter.put(
   deliveryAuth,
   updateLocation,
 );
+
+export default deliverPartnerRouter;
