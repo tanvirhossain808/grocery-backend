@@ -83,6 +83,7 @@ export const createOrder = async (req: Request, res: Response) => {
     });
   }
 
+  //send stock update events for each product in  the order
   for (const item of ordersItems) {
     await inngest.send({
       name: "inventory/stock.updated",
@@ -91,7 +92,6 @@ export const createOrder = async (req: Request, res: Response) => {
   }
 
   await inngest.send({ name: "/order/placed", data: { orderId: order.id } });
-  //send stock update events for each product in  the order
 };
 
 //get user order data
