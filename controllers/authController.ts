@@ -7,10 +7,10 @@ import jwt from "jsonwebtoken";
 
 //post/api/auth/register
 const generateToken = (id: string) => {
-  return (
-    jwt.sign({ id }, process.env.JWT_SECRET as string),
-    { expiresIn: "30d" }
-  );
+  const token = jwt.sign({ id }, process.env.JWT_SECRET as string, {
+    expiresIn: "30d",
+  });
+  return token;
 };
 const getAdminStatus = (email: string | null | undefined): boolean => {
   if (!email) return false;
@@ -62,6 +62,7 @@ export const login = async (req: Request, res: Response) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(401).json("Invalid email or password");
   const token = generateToken(user.id);
+  console.log(user.id, token, "login token");
   const userData: any = { ...user };
   delete userData.password;
   userData.isAdmin = getAdminStatus(user.email);
