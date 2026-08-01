@@ -42,6 +42,7 @@ export const createOrder = async (req: Request, res: Response) => {
       unit: dbProduct.unit,
     };
   });
+  console.log(ordersItems, "order item");
   const subtotal = ordersItems.reduce(
     (sum: number, item: any) => sum + item.price * item.quantity,
     0,
@@ -126,7 +127,7 @@ export const getOrder = async (req: Request, res: Response) => {
     },
   });
   if (!order) return res.status(400).json({ message: "Order not found" });
-  res.json(order);
+  res.json({ order });
 };
 
 //update order status
