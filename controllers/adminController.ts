@@ -9,7 +9,7 @@ export const getAdminStats = async (req: Request, res: Response) => {
     totalOrders,
     totalUsers,
     totalProducts,
-    outOfStocksProducts,
+    outOfStock,
     totalPartners,
     recentOrders,
   ] = await Promise.all([
@@ -36,7 +36,7 @@ export const getAdminStats = async (req: Request, res: Response) => {
     totalOrders,
     totalUsers,
     totalProducts,
-    outOfStocksProducts,
+    outOfStock,
     totalPartners,
     recentOrders,
   });
@@ -76,9 +76,9 @@ export const updateDeliveryPartner = async (req: Request, res: Response) => {
   const { name, phone, vehicleType, isActive } = req.body;
   const data: any = {};
   if (name) data.name = name;
-  if (name) data.phone = phone;
-  if (name) data.vehicleType = vehicleType;
-  if (name) data.isActive = isActive;
+  if (phone) data.phone = phone;
+  if (vehicleType) data.vehicleType = vehicleType;
+  data.isActive = isActive;
 
   try {
     const partner = await prisma.deliveryPartner.update({

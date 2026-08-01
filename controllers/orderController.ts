@@ -145,7 +145,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     : ([] as any[]);
   history.push({
     status,
-    note: note || `Order ${status.tolowerCase()}`,
+    note: note || `Order ${status.toLowerCase()}`,
     timeStamp: new Date(),
   });
 

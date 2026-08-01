@@ -17,7 +17,7 @@ uploadRouter.post("/", auth, upload.single("image"), async (req, res) => {
       folder: "glocery-del",
       resource_type: "auto",
     });
-    res.json({ url: result.secure_url });
+    res.json({ imageUrl: result.secure_url });
   } catch (error: any) {
     res.status(500).json({ message: error });
   }
