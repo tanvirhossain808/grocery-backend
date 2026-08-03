@@ -16,7 +16,7 @@ deliverPartnerRouter.post("/login", loginPartner);
 deliverPartnerRouter.get("/my-deliveries", deliveryAuth, getMyDeliveries);
 deliverPartnerRouter.put("/my-deliveries/:id", deliveryAuth, completedDelivery);
 deliverPartnerRouter.put(
-  "/my-deliveries/:id/completed",
+  "/my-deliveries/:id/complete",
   deliveryAuth,
   completedDelivery,
 );

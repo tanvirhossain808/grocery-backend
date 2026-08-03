@@ -21,7 +21,7 @@ export const loginPartner = async (req: Request, res: Response) => {
       .json({ message: "Please provide email and password" });
 
   const partner = await prisma.deliveryPartner.findUnique({
-    where: email.toLowerCase(),
+    where: { email: email.toLowerCase() },
   });
   if (!partner) res.status(401).json({ message: "Invalid email or password" });
 
@@ -47,7 +47,7 @@ export const getMyDeliveries = async (req: Request, res: Response) => {
   const where: any = { deliveryPartnerId: req.params!.id };
 
   if (status === "active")
-    where.status = { in: ["Assigned", "Packed", "Out for delivery"] };
+    where.status = { in: ["Assigned", "Packed", "Out for Delivery"] };
   else if (status === "completed")
     where.status = { in: ["Delivered", "Cancelled"] };
 
@@ -123,7 +123,7 @@ export const cancelDelivery = async (req: Request, res: Response) => {
     data: { status: "Cancelled", statusHistory: history },
   });
 
-  res.json({ order: updateOrderStatus, message: "Delivery cancel" });
+  res.json({ order: updatedOrder, message: "Delivery cancel" });
 };
 
 //update the order status
@@ -158,17 +158,19 @@ export const updateDeliveryStatus = async (req: Request, res: Response) => {
 
 //update live location
 
-//put /api/delivery/my-delivery/:id/location
+//put /api/delivery/my-deliveries/:id/location
 
 export const updateLocation = async (req: Request, res: Response) => {
   const { lat, lng } = req.body;
+  console.log(req.params?.id, "id");
   const order = await prisma.order.findFirst({
     where: {
       id: req.params.id as string,
       deliveryPartnerId: req.partner?.id,
-      status: { in: ["Assigned", "packed", "Out for Delivery"] },
+      status: { in: ["Assigned", "Packed", "Out for Delivery"] },
     },
   });
+  console.log(order, "order");
   await prisma.order.update({
     where: {
       id: order?.id,
