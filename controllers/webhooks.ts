@@ -16,8 +16,8 @@ export const stripeWebHook = async (req: Request, res: Response) => {
         signature as string,
         endpointSecret,
       );
-    } catch (err) {
-      console.log(`⚠️ Webhook signature verification failed.`, err.message);
+    } catch (err: any) {
+      console.log(`⚠️ Webhook signature verification failed.`, err?.message);
       return res.sendStatus(400);
     }
 
@@ -86,7 +86,7 @@ export const stripeWebHook = async (req: Request, res: Response) => {
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
-
+    console.log("in the weebhook");
     // Return a response to acknowledge receipt of the event
     res.json({ received: true });
   }

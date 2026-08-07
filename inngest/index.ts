@@ -188,7 +188,7 @@ const autoAssignRider = inngest.createFunction(
         return { skipped: true, reason: `Order is ${order.status}` };
       const busyOrders = await prisma.order.findMany({
         where: {
-          status: { in: ["Assigned", "packed", "Out for deliver"] },
+          status: { in: ["Assigned", "Packed", "Out for deliver"] },
           deliveryPartnerId: { not: null },
         },
         select: { deliveryPartnerId: true },
@@ -214,7 +214,7 @@ const autoAssignRider = inngest.createFunction(
         note: ` Auto assigned to ${availableRider.name}`,
         timeStamp: new Date(),
       });
-      prisma.order.update({
+      const orderUp = await prisma.order.update({
         where: { id: orderId },
         data: {
           deliveryPartnerId: availableRider.id,
@@ -228,6 +228,9 @@ const autoAssignRider = inngest.createFunction(
         riderId: availableRider.id,
         riderName: availableRider.name,
         orderId,
+        otp,
+        history,
+        orderUp,
       };
     });
     return result;

@@ -3,7 +3,6 @@
 
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
-import { error, timeStamp } from "node:console";
 import { inngest } from "../inngest/index.js";
 import Stripe from "stripe";
 export const createOrder = async (req: Request, res: Response) => {
@@ -70,6 +69,8 @@ export const createOrder = async (req: Request, res: Response) => {
       ],
     },
   });
+
+  // return;
   if (paymentMethod === "card") {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
     const session = await stripe.checkout.sessions.create({
@@ -90,10 +91,11 @@ export const createOrder = async (req: Request, res: Response) => {
       mode: "payment",
       metadata: { orderId: order.id },
     });
-    res.json({ url: session.url });
+    console.log(session.success_url, "successUrl");
+    return res.json({ url: session.url });
   }
   //check product is in stock
-  res.json({ order });
+  if (paymentMethod !== "card") res.json({ order });
 
   //decrease stock
   for (const item of ordersItems) {
@@ -110,7 +112,6 @@ export const createOrder = async (req: Request, res: Response) => {
       data: { productId: item.product },
     });
   }
-
   await inngest.send({ name: "/order/placed", data: { orderId: order.id } });
 };
 
